@@ -19,6 +19,13 @@ let currentPlayer = 0;
 const symbols = ["X", "O"];
 
 const cells = document.getElementsByTagName("td");
+const timer = document.getElementById("timer");
+let startTime = new Date();
+function updateTimer() {
+    timer.innerText = Math.round((new Date() - startTime)/1000);
+}
+
+let timerInterval = setInterval(updateTimer, 1000);
 
 for (let cellNum = 0; cellNum<cells.length; cellNum++) {
     console.log(cellNum);
@@ -58,7 +65,21 @@ function checkGameEnd() {
             if (!currentSymbol) isFull = false;
             isSameSymbol = isSameSymbol && (firstSymbol === currentSymbol);
         }
-        if (isSameSymbol) alert(`Player ${firstSymbol} has won!!`);
+        if (isSameSymbol) {
+            clearInterval(timerInterval);
+            alert(`Player ${firstSymbol} has won!!`);
+        }
     } 
-    if (isFull) alert(`The game is a draw`);
+    if (isFull) {
+        clearInterval(timerInterval);
+        alert(`The game is a draw`);
+    }
 }
+
+
+
+
+// setInterval(() => {
+
+// }, 1000);
+
