@@ -14,9 +14,46 @@ const maxPlayers = 2;
 const numCols = 3;
 const numRows = 3;
 
+let XWins;
+let OWins;
+let numDraws;
 
-let currentPlayer = 0;
+const xData = localStorage.getItem("X");
+if (xData) XWins = xData;
+else XWins = 0;
+document.getElementById("XWins").innerText = XWins;
+
+const oData = localStorage.getItem("O");
+if (oData) OWins = oData;
+else OWins = 0;
+document.getElementById("OWins").innerText = OWins;
+
+const drawData = localStorage.getItem("Draws");
+if (drawData) numDraws = drawData;
+else numDraws = 0;
+document.getElementById("numDraws").innerText = numDraws;
+
+let currentPlayer;
+let gridData;
 const symbols = ["X", "O"];
+
+let gameData = localStorage.getItem("Game Data");
+if (gameData) {
+    gameData = JSON.parse(gameData);
+    currentPlayer = gameData["currentPlayer"];
+}
+else {
+    currentPlayer = 0;
+    gameData = {
+        // "currentPlayer": currentPlayer,
+        currentPlayer,
+        gridData: [
+            "", "", "",
+            "", "", "",
+            "", "", ""
+        ]
+    }
+}
 
 const cells = document.getElementsByTagName("td");
 const timer = document.getElementById("timer");
@@ -29,14 +66,19 @@ let timerInterval = setInterval(updateTimer, 1000);
 
 for (let cellNum = 0; cellNum<cells.length; cellNum++) {
     console.log(cellNum);
+    cells[cellNum].innerText = gameData["gridData"][cellNum];
     cells[cellNum].addEventListener("click", (event) => {
         console.log("clicked");
         const currentCell = event.target;
         if (currentCell.innerText) return;
         currentCell.innerText = symbols[currentPlayer];
+        gameData["gridData"][cellNum] = symbols[currentPlayer];
+        console.log(gameData["gridData"]);
         checkGameEnd();
         currentPlayer++;
         currentPlayer = currentPlayer % maxPlayers;
+        gameData["currentPlayer"] = currentPlayer;
+        localStorage.setItem("Game Data", JSON.stringify(gameData));
     });
 }
 
@@ -67,11 +109,22 @@ function checkGameEnd() {
         }
         if (isSameSymbol) {
             clearInterval(timerInterval);
+            if (firstSymbol === "X") {
+                XWins++;
+                localStorage.setItem("X", XWins);
+            }
+            else {
+                OWins++; 
+                localStorage.setItem("O", OWins);
+            }
             alert(`Player ${firstSymbol} has won!!`);
+
         }
     } 
     if (isFull) {
         clearInterval(timerInterval);
+        numDraws++;
+        localStorage.setItem("Draws", numDraws);
         alert(`The game is a draw`);
     }
 }
